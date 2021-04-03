@@ -89,7 +89,6 @@ class StudentController extends Controller
             $password_random = $this->randomPwd();
             $student->password = Hash::make($password_random);
         }
-        $student->create_by = $request->user()->id;
         if ($student->save()) {
             if (isset($password_random))
                 $student->password_random = $password_random;
@@ -145,10 +144,11 @@ class StudentController extends Controller
 
             // Thêm dữ liệu vào database
             if ($check == false) {
-                $dataTable[$key]['status'] = false;
+                $dataTable[$key]['status'] = 0;
             } else {
+                // Đã tồn tại
                 if (Student::where('mssv', $value[$tableHeader['mssv'][0]])->first()) {
-                    $dataTable[$key]['status'] = false;
+                    $dataTable[$key]['status'] = 2;
                 } else {
                     $student = new Student();
                     foreach ($tableHeader as $kFill => $vFill) {
@@ -164,16 +164,15 @@ class StudentController extends Controller
                         $student->password = Hash::make($password_random);
                     }
 
-                    $student->create_by = $request->user()->id;
                     if ($student->save()) {
                     // if (true) {
                         if (isset($password_random)) {
                             $dataTable[$key]['password_random'] = $password_random;
                             $password_random_flag = true;
                         }
-                        $dataTable[$key]['status'] = true;
+                        $dataTable[$key]['status'] = 1;
                     } else {
-                        $dataTable[$key]['status'] = false;
+                        $dataTable[$key]['status'] = 0;
                     }
                 }
             }
@@ -234,13 +233,8 @@ class StudentController extends Controller
     {
         $user = Student::find($id);
         if ($user) {
-            if (isset($request['id'])) {
-                unset($request['id']);
-            }
-            if (isset($request['create_by'])) {
-                unset($request['create_by']);
-            }
 
+            // EMAIL
             if (isset($request->email)) {
                 if (!filter_var($request->email, FILTER_VALIDATE_EMAIL)) {
                     return response()->json([
@@ -248,16 +242,10 @@ class StudentController extends Controller
                         'message' => 'Email sai định dạng'
                     ]);
                 }
+                $user->email = $request->email;
             }
-            $request->validate([
-                'mssv' => 'required',
-                'first_name' => 'required|min:2|max:50',
-                'last_name' => 'required|min:2|max:20',
-                'sex' => 'required|boolean',
-                'birthday' => 'required|date',
-                'address' => 'required|max:255'
-            ]);
 
+            // Số điện thoại
             if (isset($request->phone_number)) {
                 $request->phone_number = preg_replace('/\s+/', '', $request->phone_number);
                 if (!preg_match("/[0-9]{10}/", $request->phone_number)) {
@@ -266,18 +254,49 @@ class StudentController extends Controller
                         'message' => 'Số điện thoại phải là 10 số (chấp nhận khoảng trắng)'
                     ]);
                 }
-            }
-            $request->birthday = new DateTime($request->birthday);
-            $request->birthday = $request->birthday->format('Y-m-d');
-            if (!preg_match("/(19|20)[0-9]{2}\-(0?[1-9]|1[012])\-(1[0-9]|2[0-9]|3[01]|0?[1-9])/", $request->birthday)) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Ngày sinh không hợp lệ'
-                ]);
+                $user->phone_number = $request->phone_number;
             }
 
-            $user->fill($request->all());
-            $user->birthday = $request->birthday;
+            // Sinh nhật
+            if (isset($request->birthday)) {
+                $request->birthday = new DateTime($request->birthday);
+                $request->birthday = $request->birthday->format('Y-m-d');
+                if (!preg_match("/(19|20)[0-9]{2}\-(0?[1-9]|1[012])\-(1[0-9]|2[0-9]|3[01]|0?[1-9])/", $request->birthday)) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Ngày sinh không hợp lệ'
+                    ]);
+                    $user->birthday = $request->birthday;
+                }
+            }
+
+            // Mật khẩu mới
+            if (isset($request->password) && !empty($request->password)) {
+                $request->password = Hash::make($request->password);
+                $user->password = $request->password;
+            }
+
+            // Họ và tên lót
+            if (isset($request->first_name) && !empty($request->first_name)) {
+                $user->first_name = $request->first_name;
+            }
+
+            // Tên
+            if (isset($request->last_name) && !empty($request->last_name)) {
+                $user->last_name = $request->last_name;
+            }
+
+            // Địa chỉ
+            if (isset($request->address) && !empty($request->address)) {
+                $user->address = $request->address;
+            }
+
+            // Giới tính
+            if (isset($request->sex) && ($request->sex == true || $request->sex == false)) {
+                $user->sex = $request->sex;
+            }
+
+            // UPDATE Database
             if ($user->save()) {
                 return response()->json([
                     'status' => true,

@@ -15,10 +15,8 @@ class CreateTicketRequestsTable extends Migration
     {
         Schema::create('ticket_requests', function (Blueprint $table) {
             $table->id();
-            // $table->integer("user_send");
-            // $table->integer("user_take");
-            $table->foreignId('user_send')->references('id')->on("students")->onDelete('restrict')->onUpdate('cascade');
-            $table->foreignId('user_take')->references('id')->on("lecturers")->onDelete('restrict')->onUpdate('cascade');
+            $table->foreignId('student_send')->references('id')->on("students")->onDelete('restrict')->onUpdate('cascade');
+            $table->foreignId('lecturer_take')->references('id')->on("lecturers")->onDelete('restrict')->onUpdate('cascade');
             $table->string("title");
             $table->string("content");
             $table->tinyInteger("status")->default(0)->comment("0: Chưa xem, 1: Đã xem");

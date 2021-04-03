@@ -15,7 +15,8 @@ class CreateQuestionRepliesTable extends Migration
     {
         Schema::create('question_replies', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('member_id')->references('id')->on("class_members")->onDelete('restrict')->onUpdate('cascade');
+            $table->foreignId('lecturer_reply')->nullable()->references('id')->on("lecturers")->onDelete('restrict')->onUpdate('cascade');
+            $table->foreignId('member_reply')->references('id')->on("class_members")->onDelete('restrict')->onUpdate('cascade');
             $table->foreignId('question_id')->references('id')->on("questions")->onDelete('restrict')->onUpdate('cascade');
             $table->text("content");
             $table->timestamps();

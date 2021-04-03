@@ -69,8 +69,6 @@ class LecturerController extends Controller
         if (!isset($user->role))
             $user->role = 'gv';
 
-        $user->create_by = $request->user()->id;
-
         if ($user->save()) {
             return response()->json([
                 'status' => true,

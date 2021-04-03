@@ -15,6 +15,7 @@ class CreateClassSubjectsTable extends Migration
     {
         Schema::create('class_subjects', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('create_by')->references('id')->on("lecturers")->onDelete('restrict')->onUpdate('cascade');
             $table->foreignId('subject_id')->references('id')->on("subjects")->onDelete('restrict')->onUpdate('cascade');
             $table->string("name");
             $table->string("description")->nullable();

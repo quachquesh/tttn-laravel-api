@@ -16,7 +16,8 @@ class CreateTicketRequestRepliesTable extends Migration
         Schema::create('ticket_request_replies', function (Blueprint $table) {
             $table->id();
             $table->foreignId('ticket_id')->references('id')->on("ticket_requests")->onDelete('restrict')->onUpdate('cascade');
-            $table->foreignId('reply_by')->references('id')->on("lecturers")->onDelete('restrict')->onUpdate('cascade');
+            $table->foreignId('lecturer_reply')->nullable()->references('id')->on("lecturers")->onDelete('restrict')->onUpdate('cascade');
+            $table->foreignId('student_reply')->nullable()->references('id')->on("students")->onDelete('restrict')->onUpdate('cascade');
             $table->string("content");
             $table->timestamps();
         });

@@ -15,7 +15,7 @@ class CreateLecturersTable extends Migration
     {
         Schema::create('lecturers', function (Blueprint $table) {
             $table->id();
-            $table->string("email");
+            $table->string("email")->unique();
             $table->string("password");
             $table->string("role");
             $table->tinyInteger("isActive")->default(1);
@@ -25,7 +25,6 @@ class CreateLecturersTable extends Migration
             $table->date("birthday");
             $table->string("phone_number", 11)->nullable();
             $table->string("address");
-            $table->integer("create_by");
             $table->timestamps();
         });
     }

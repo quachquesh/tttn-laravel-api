@@ -16,7 +16,7 @@ class CreateStudentsTable extends Migration
         Schema::create('students', function (Blueprint $table) {
             $table->id();
             $table->string("email")->nullable();
-            $table->string("mssv");
+            $table->string("mssv")->unique();
             $table->string("password");
             $table->tinyInteger("isActive")->default(1);
             $table->string("first_name", 50);
@@ -25,7 +25,6 @@ class CreateStudentsTable extends Migration
             $table->date("birthday");
             $table->string("phone_number", 11)->nullable();
             $table->string("address");
-            $table->foreignId('create_by')->references('id')->on("lecturers")->onDelete('restrict')->onUpdate('cascade');
             $table->timestamps();
         });
     }
