@@ -15,9 +15,9 @@ class CreateNotifiesTable extends Migration
     {
         Schema::create('notifies', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('lecturer_id')->nullable()->references('id')->on("lecturers")->onDelete('restrict')->onUpdate('cascade');
-            $table->foreignId('member_id')->nullable()->references('id')->on("class_members")->onDelete('restrict')->onUpdate('cascade');
-            $table->foreignId('class_id')->references('id')->on("class_subjects")->onDelete('restrict')->onUpdate('cascade');
+            $table->foreignId('lecturer_id')->nullable()->references('id')->on("lecturers")->onDelete('restrict');
+            $table->foreignId('member_id')->nullable()->references('id')->on("class_members")->onDelete('cascade');
+            $table->foreignId('class_id')->references('id')->on("class_subjects")->onDelete('restrict');
             $table->text("content");
             $table->timestamps();
         });

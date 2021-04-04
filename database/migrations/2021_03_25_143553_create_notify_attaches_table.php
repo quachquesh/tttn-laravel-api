@@ -15,7 +15,7 @@ class CreateNotifyAttachesTable extends Migration
     {
         Schema::create('notify_attaches', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('notify_id')->references('id')->on("notifies")->onDelete('restrict')->onUpdate('cascade');
+            $table->foreignId('notify_id')->references('id')->on("notifies")->onDelete('cascade');
             $table->text("link");
             $table->timestamps();
         });

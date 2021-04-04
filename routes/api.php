@@ -6,45 +6,49 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::prefix('v1')->group(function () {
-    // check quyền admin
-    Route::middleware(['auth:api-lecturer', 'scopes:admin'])->group(function () {
-        Route::prefix('student')->group(function () {
-            Route::post('', 'StudentController@store');
-            Route::post('create-list', 'StudentController@createList');
-            Route::patch('lock', 'StudentController@lockAccount');
-            Route::patch('unlock', 'StudentController@unlockAccount');
-            Route::put('{id}', 'StudentController@update')->where('id', '[0-9]+');
-        });
+    // // check quyền admin
+    // Route::middleware(['auth:api-lecturer', 'scopes:admin'])->group(function () {
+    //     Route::prefix('student')->group(function () {
+    //         Route::post('', 'StudentController@store');
+    //         Route::post('create-list', 'StudentController@createList');
+    //         Route::patch('lock/{id}', 'StudentController@lockAccount')->where('id', '[0-9]+');
+    //         Route::patch('unlock/{id}', 'StudentController@unlockAccount')->where('id', '[0-9]+');
+    //         Route::put('{id}', 'StudentController@update')->where('id', '[0-9]+');
+    //     });
 
-        Route::prefix('lecturer')->group(function () {
-            Route::post('', 'LecturerController@store');
-        });
-    });
+    //     Route::prefix('lecturer')->group(function () {
+    //         Route::post('', 'LecturerController@store');
+    //     });
+
+    //     Route::prefix('subject')->group(function () {
+    //         Route::post('', 'SubjectController@store');
+    //     });
+    // });
 
     // Có quyền gv, admin mới được
-    Route::middleware(['auth:api-lecturer', 'scope:gv,admin'])->group(function () {
-        // student
-        Route::prefix('student')->group(function () {
-            Route::get('', 'StudentController@index');
-        });
+    // Route::middleware(['auth:api-lecturer', 'scope:gv,admin'])->group(function () {
+    //     // student
+    //     Route::prefix('student')->group(function () {
+    //         Route::get('', 'StudentController@index');
+    //     });
 
-        // Môn học
-        Route::prefix('subject')->group(function () {
-            Route::post('', 'SubjectController@store');
-            Route::get('', "SubjectController@index");
-            Route::get('/user', "SubjectController@showByUserId");
-        });
-        // Lớp học
-        Route::prefix('class-subject')->group(function () {
-            Route::post('', 'ClassSubjectController@store');
-            Route::get('/subject/{id}', 'ClassSubjectController@showBySubject')->where('id', '[0-9]+');
-        });
-        // Thành viên lớp
-        Route::prefix('class-member')->group(function () {
-            Route::post('', "ClassMemberController@store");
-            Route::get('{id}', "ClassMemberController@index");
-        });
-    });
+    //     // Môn học
+    //     Route::prefix('subject')->group(function () {
+    //         Route::get('', "SubjectController@index");
+    //         Route::get('/user', "SubjectController@showByUserId");
+    //     });
+    //     // Lớp học
+    //     Route::prefix('class-subject')->group(function () {
+    //         Route::post('', 'ClassSubjectController@store');
+    //         Route::get('/subject/{id}', 'ClassSubjectController@showBySubject')->where('id', '[0-9]+');
+    //     });
+    //     // Thành viên lớp
+    //     Route::prefix('class-member')->group(function () {
+    //         Route::post('', "ClassMemberController@store");
+    //         Route::get('{id}', "ClassMemberController@index");
+    //         Route::delete('{id}', "ClassMemberController@destroy");
+    //     });
+    // });
 
     // student
     Route::prefix('student')->group(function () {
@@ -53,21 +57,52 @@ Route::prefix('v1')->group(function () {
             Route::get('details', 'StudentController@details');
             Route::get('logout', 'StudentController@logout');
         });
+        // check quyền admin
+        Route::middleware(['auth:api-lecturer', 'scopes:admin'])->group(function () {
+            Route::post('', 'StudentController@store');
+            Route::post('create-list', 'StudentController@createList');
+            Route::patch('lock/{id}', 'StudentController@lockAccount')->where('id', '[0-9]+');
+            Route::patch('unlock/{id}', 'StudentController@unlockAccount')->where('id', '[0-9]+');
+            Route::put('{id}', 'StudentController@update')->where('id', '[0-9]+');
+        });
+
+        // Có quyền gv, admin mới được
+        Route::middleware(['auth:api-lecturer', 'scope:gv,admin'])->group(function () {
+            Route::get('', 'StudentController@index');
+        });
     });
 
     // lecturer
     Route::prefix('lecturer')->group(function () {
         Route::post('login', 'LecturerController@login');
+
         Route::middleware(['auth:api-lecturer', 'scope:gv,admin'])->group(function () {
             Route::get('details', 'LecturerController@details');
             Route::get('logout', 'LecturerController@logout');
+        });
+
+        // quyền admin
+        Route::middleware(['auth:api-lecturer', 'scopes:admin'])->group(function () {
+            Route::post('', 'LecturerController@store');
         });
     });
 
     // Môn học
     Route::prefix('subject')->group(function () {
         Route::get('/{id}', "SubjectController@show")->where('id', '[0-9]+');
+
+        // admin
+        Route::middleware(['auth:api-lecturer', 'scopes:admin'])->group(function () {
+            Route::post('', 'SubjectController@store');
+        });
+
+        // gv, admin
+        Route::middleware(['auth:api-lecturer', 'scope:gv,admin'])->group(function () {
+            Route::get('', "SubjectController@index");
+            Route::get('/user', "SubjectController@showByUserId");
+        });
     });
+
     // Lớp học
     Route::prefix('class-subject')->group(function () {
         Route::middleware(['auth:api-student'])->group(function () {
@@ -75,8 +110,34 @@ Route::prefix('v1')->group(function () {
         });
         Route::get('/{id}', 'ClassSubjectController@show')->where('id', '[0-9]+');
         Route::get('/all-info/{id}', 'ClassSubjectController@allInfo')->where('id', '[0-9]+');
+
+        // admin
+        Route::middleware(['auth:api-lecturer', 'scopes:admin'])->group(function () {
+
+        });
+
+        // gv, admin
+        Route::middleware(['auth:api-lecturer', 'scope:gv,admin'])->group(function () {
+            Route::post('', 'ClassSubjectController@store');
+            Route::get('/subject/{id}', 'ClassSubjectController@showBySubject')->where('id', '[0-9]+');
+        });
     });
+
+    // Thành viên lớp
     Route::prefix('class-member')->group(function () {
-        Route::get('/{id}', "ClassMemberController@index")->where('id', '[0-9]+');
+        Route::get('{class_id}', "ClassMemberController@index")->where('class_id', '[0-9]+');
+
+        // admin
+        Route::middleware(['auth:api-lecturer', 'scopes:admin'])->group(function () {
+
+        });
+
+        // gv, admin
+        Route::middleware(['auth:api-lecturer', 'scope:gv,admin'])->group(function () {
+            Route::post('', "ClassMemberController@store");
+            // Route::get('{class_id}', "ClassMemberController@index")->where('class_id', '[0-9]+');
+            Route::delete('{class_id}', "ClassMemberController@destroy")->where('class_id', '[0-9]+');
+            Route::post("list-member", "ClassMemberController@destroyList");
+        });
     });
 });

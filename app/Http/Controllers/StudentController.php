@@ -184,9 +184,9 @@ class StudentController extends Controller
         return response()->json($data, 201);
     }
 
-    public function lockAccount(Request $request)
+    public function lockAccount($id)
     {
-        $user = Student::find($request->id);
+        $user = Student::find($id);
         if ($user) {
             $user->isActive = 0;
             if ($user->save()) {
@@ -204,9 +204,9 @@ class StudentController extends Controller
         return response()->json([], 404);
     }
 
-    public function unlockAccount(Request $request)
+    public function unlockAccount($id)
     {
-        $user = Student::find($request->id);
+        $user = Student::find($id);
         if ($user) {
             $user->isActive = 1;
             if ($user->save()) {
@@ -243,6 +243,8 @@ class StudentController extends Controller
                     ]);
                 }
                 $user->email = $request->email;
+            } else {
+                $user->email = "";
             }
 
             // Số điện thoại
@@ -255,6 +257,8 @@ class StudentController extends Controller
                     ]);
                 }
                 $user->phone_number = $request->phone_number;
+            } else {
+                $user->phone_number = "";
             }
 
             // Sinh nhật

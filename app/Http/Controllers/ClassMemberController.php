@@ -12,9 +12,16 @@ class ClassMemberController extends Controller
     public function index($id)
     {
         $members = ClassMember::where("class_id", $id)
-                    ->join("students", "class_members.student_id", "=", "students.id")
-                    ->select("students.*")
-                    ->get();
+                            ->join("students", "class_members.student_id", "=", "students.id")
+                            ->select("students.*", "class_members.id as member_id")
+                            ->get();
+
+        foreach ($members as $key => $value) {
+            if (isset($value['password'])) {
+                unset($members[$key]['password']);
+            }
+        }
+
         return response()->json($members);
     }
     public function store(Request $request)
@@ -51,15 +58,18 @@ class ClassMemberController extends Controller
                             $classMember->student_id = $student;
                             $classMember->class_id = $request->classId;
                             $classMember->role = 0;
+                            $test = $classMember->save();
+
                             if($classMember->save()) {
                                 $studentFind->status = $success;
+                                $studentFind->member_id = $classMember->id;
                                 array_push($listData, $studentFind);
                             }
                         } else { // Nếu đã học lớp cùng môn
                             $studentFind->status = $fail;
                             array_push($listData, $studentFind);
                         }
-                    } else {
+                    } else { // Nếu đã có trong lớp
                         $studentFind->status = $duplicate;
                         array_push($listData, $studentFind);
                     }
@@ -90,10 +100,11 @@ class ClassMemberController extends Controller
                             $classMember->role = 0;
                             if($classMember->save()) {
                                 $studentFind->status = $success;
+                                $studentFind->member_id = $classMember->id;
                                 array_push($listData, $studentFind);
                             }
                         }
-                    } else {
+                    } else { // Nếu đã có trong lớp
                         $studentFind->status = $duplicate;
                         array_push($listData, $studentFind);
                     }
@@ -113,14 +124,34 @@ class ClassMemberController extends Controller
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
-        //
+        if (ClassMember::destroy($id)) {
+            return response()->json([
+                "status" => true,
+                "message" => "Xóa thành công"
+            ]);
+        } else {
+            return response()->json([
+                "status" => false,
+                "message" => "Xóa thất bại"
+            ]);
+        }
+    }
+
+    public function destroyList(Request $request)
+    {
+        $listMember = $request->listMember;
+        $listSuccess = [];
+        foreach ($listMember as $id) {
+            if (ClassMember::destroy($id)) {
+                array_push($listSuccess, $id);
+            }
+        }
+        return response()->json([
+            "status" => true,
+            "message" => "Xóa thành viên thành công",
+            "data" => $listSuccess
+        ]);
     }
 }

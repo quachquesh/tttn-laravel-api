@@ -85,9 +85,13 @@ class ClassSubjectController extends Controller
 
         $classMembers = ClassMember::where("class_id", $id)
                             ->join("students", "class_members.student_id", "=", "students.id")
-                            ->select("students.*")
+                            ->select("students.*", "class_members.id as member_id")
                             ->get();
-
+        foreach ($classMembers as $key => $value) {
+            if (isset($value['password'])) {
+                unset($classMembers[$key]['password']);
+            }
+        }
         $classLecturer = Lecturer::select("lecturers.*")
                             ->join("class_subjects", "class_subjects.create_by", "=", "lecturers.id")
                             ->where("class_subjects.id", $id)

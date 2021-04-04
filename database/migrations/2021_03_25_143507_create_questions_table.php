@@ -15,8 +15,8 @@ class CreateQuestionsTable extends Migration
     {
         Schema::create('questions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('member_id')->references('id')->on("class_members")->onDelete('restrict')->onUpdate('cascade');
-            $table->foreignId('class_id')->references('id')->on("class_subjects")->onDelete('restrict')->onUpdate('cascade');
+            $table->foreignId('member_id')->references('id')->on("class_members")->onDelete('cascade');
+            $table->foreignId('class_id')->references('id')->on("class_subjects")->onDelete('restrict');
             $table->string("title");
             $table->text("content");
             $table->tinyInteger("isReply")->default(1)->comment("0: khóa bình luận, 1: mở bình luận");

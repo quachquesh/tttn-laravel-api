@@ -15,8 +15,8 @@ class CreateNotifyToMembersTable extends Migration
     {
         Schema::create('notify_to_members', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('member_id')->references('id')->on("class_members")->onDelete('restrict')->onUpdate('cascade');
-            $table->foreignId('notify_id')->references('id')->on("notifies")->onDelete('restrict')->onUpdate('cascade');
+            $table->foreignId('member_id')->references('id')->on("class_members")->onDelete('cascade');
+            $table->foreignId('notify_id')->references('id')->on("notifies")->onDelete('restrict');
             $table->timestamps();
         });
     }
