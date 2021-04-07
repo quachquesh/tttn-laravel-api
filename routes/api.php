@@ -53,7 +53,7 @@ Route::prefix('v1')->group(function () {
     // student
     Route::prefix('student')->group(function () {
         Route::post('login', 'StudentController@login');
-        Route::middleware(['auth:api-student'])->group(function () {
+        Route::middleware(['auth:api-student', 'scopes:sv'])->group(function () {
             Route::get('details', 'StudentController@details');
             Route::get('logout', 'StudentController@logout');
         });
@@ -105,7 +105,7 @@ Route::prefix('v1')->group(function () {
 
     // Lớp học
     Route::prefix('class-subject')->group(function () {
-        Route::middleware(['auth:api-student'])->group(function () {
+        Route::middleware(['auth:api-student', 'scopes:sv'])->group(function () {
             Route::get('/user', 'ClassSubjectController@index');
         });
         Route::get('/{id}', 'ClassSubjectController@show')->where('id', '[0-9]+');

@@ -25,11 +25,6 @@ class Lecturer extends Authenticatable
         'create_by'
     ];
 
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
     protected $hidden = [
         'password'
     ];

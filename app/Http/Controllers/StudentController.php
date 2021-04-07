@@ -340,7 +340,7 @@ class StudentController extends Controller
             } else {
                 if (Hash::check($request->password, $user->password)) {
 
-                    $tokenResult = $user->createToken('Students');
+                    $tokenResult = $user->createToken('Students', ['sv']);
                     $user->token = $tokenResult->accessToken;
                     // $user->token_expires_at = Carbon::parse($tokenResult->token->expires_at)->toDateTimeString();
 
