@@ -12,6 +12,7 @@ php artisan key:generate
 ## 4. setting <b>database</b> file <b>.env</b>
 ## 5. run cmd
 ```
+php artisan migrate
 php artisan passport:install
 ```
 ## 6. run cmd
@@ -43,4 +44,8 @@ class Lecturer extends Model implements
     use Authenticatable, Authorizable, CanResetPassword, MustVerifyEmail;
 }
 
+```
+## 9. run cmd
+```
+php artisan config:cache
 ```
