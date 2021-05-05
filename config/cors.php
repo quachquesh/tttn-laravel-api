@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    // 'allowed_origins' => ['*.nqtrung.xyz', 'http://nqtrung.xyz', 'https://nqtrung.xyz'],
+    // 'allowed_origins' => ['*.nqtrung.xyz', 'http://nqtrung.xyz', 'https://nqtrung.xyz', '*.nqtrung.fun'],
     'allowed_origins' => ['*'],
 
     'allowed_origins_patterns' => [],

@@ -8,6 +8,7 @@ class NotifyAttach extends Model
 {
     protected $fillable = [
         'notify_id',
+        'file_name',
         'link'
     ];
 

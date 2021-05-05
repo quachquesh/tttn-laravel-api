@@ -8,7 +8,8 @@ class NotifyToMember extends Model
 {
     protected $fillable = [
         'member_id',
-        'notify_id'
+        'notify_id',
+        'status'
     ];
 
     /**
@@ -17,6 +18,6 @@ class NotifyToMember extends Model
      * @var array
      */
     protected $hidden = [
-
+        'password'
     ];
 }

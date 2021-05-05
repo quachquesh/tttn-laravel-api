@@ -101,6 +101,7 @@ Route::prefix('v1')->group(function () {
             Route::get('', "SubjectController@index");
             Route::get('/user', "SubjectController@showByUserId");
         });
+
     });
 
     // Lớp học
@@ -119,6 +120,7 @@ Route::prefix('v1')->group(function () {
         // gv, admin
         Route::middleware(['auth:api-lecturer', 'scope:gv,admin'])->group(function () {
             Route::post('', 'ClassSubjectController@store');
+            Route::get('', 'ClassSubjectController@getAllClass');
             Route::get('/subject/{id}', 'ClassSubjectController@showBySubject')->where('id', '[0-9]+');
         });
     });
@@ -140,4 +142,20 @@ Route::prefix('v1')->group(function () {
             Route::post("list-member", "ClassMemberController@destroyList");
         });
     });
+
+    Route::prefix('notify')->group(function () {
+        // notify
+        Route::post('{class_id}', "NotifyController@store")->where('class_id', '[0-9]+');
+        Route::put('{notify_id}', "NotifyController@update")->where('notify_id', '[0-9]+');
+        Route::delete('{class_id}/{notify_id}', "NotifyController@destroy")->where(['class_id' => '[0-9]+', 'notify_id' => '[0-9]+']);
+        Route::get("/listMember/{notify_id}", "NotifyController@getNotifyToMember")->where(["notify_id" => "[0-9]+"]);
+
+        // reply
+        Route::post('{notify_id}/reply', "NotifyController@replyStore")->where('notify_id', '[0-9]+');
+        Route::put('{class_id}/reply/{reply_id}', "NotifyController@replyUpdate")->where(['class_id' => '[0-9]+','reply_id' => '[0-9]+']);
+        Route::delete('{class_id}/reply/{reply_id}', "NotifyController@replyDestroy")->where(['class_id' => '[0-9]+','reply_id' => '[0-9]+']);
+    });
+
+    Route::get('download', "DownloadController@download");
+    Route::get("user/details", "UserController@details");
 });

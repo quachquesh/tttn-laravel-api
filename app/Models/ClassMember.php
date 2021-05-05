@@ -19,6 +19,6 @@ class ClassMember extends Model
      * @var array
      */
     protected $hidden = [
-
+        'password'
     ];
 }

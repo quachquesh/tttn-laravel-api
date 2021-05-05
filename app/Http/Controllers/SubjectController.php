@@ -53,9 +53,13 @@ class SubjectController extends Controller
         $subjects = ClassSubject::where("create_by", $userId)
                                 ->join("subjects", "class_subjects.subject_id", "=", "subjects.id")
                                 ->select("subjects.*")
-                                ->groupBy("subjects.id")
                                 ->get();
-        return response()->json($subjects);
+        $subjects = $subjects->groupBy("id");
+        $result = [];
+        foreach ($subjects as $value) {
+            array_push($result, $value[0]);
+        }
+        return response()->json($result);
     }
 
     public function update(Request $request, $id)
