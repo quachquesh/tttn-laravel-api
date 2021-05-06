@@ -5,23 +5,14 @@ npm install
 composer install
 ```
 ## 2. copy folder <b>.env.example</b> -> <b>.env</b>
-## 3. run cmd
+## 3. setting <b>database</b> file <b>.env</b>
+## 4. run cmd
 ```
 php artisan key:generate
-```
-## 4. setting <b>database</b> file <b>.env</b>
-## 5. run cmd
-```
 php artisan migrate
-php artisan passport:install
 ```
-## 6. run cmd
-```
-php artisan passport:client --paswword
-```
-### - Enter -> chọn 1, lặp lại -> chọn 2
-## 7. open <b>vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Auth</b>
-## 8. Create file <b>Lecturer.php</b> + <b>Student.php</b> (edit class name)
+## 5. open folder <b>vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Auth</b>
+## - Tạo 2 file <b>Lecturer.php</b> + <b>Student.php</b> (edit class name)
 ```php
 <?php
 
@@ -45,7 +36,16 @@ class Lecturer extends Model implements
 }
 
 ```
-## 9. run cmd
+## 6. run cmd
+```
+php artisan passport:install
+```
+## 7. run cmd
+```
+php artisan passport:client --password
+```
+### - Enter -> chọn 1, lặp lại -> chọn 2
+## 8. run cmd
 ```
 php artisan config:cache
 ```

@@ -25,19 +25,29 @@ class SubjectController extends Controller
             'name' => 'required',
             'img' => 'required'
         ]);
-        $subject = new Subject;
-        $subject->fill($request->all());
-        if ($subject->save()) {
-            return response()->json([
-                'status' => true,
-                'message' => "Tạo môn học thành công",
-                'data' => $subject
-            ]);
-        } else {
+        $checkSubject = Subject::where("name", $request->name)
+                                ->where("description", $request->description)
+                                ->first();
+        if ($checkSubject) {
             return response()->json([
                 'status' => false,
-                'message' => "Tạo môn học thất bại"
+                'message' => "Môn học đã tồn tại"
             ]);
+        } else {
+            $subject = new Subject;
+            $subject->fill($request->all());
+            if ($subject->save()) {
+                return response()->json([
+                    'status' => true,
+                    'message' => "Tạo môn học thành công",
+                    'data' => $subject
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => "Tạo môn học thất bại"
+                ]);
+            }
         }
     }
 
