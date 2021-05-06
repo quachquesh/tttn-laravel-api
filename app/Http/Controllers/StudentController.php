@@ -56,7 +56,7 @@ class StudentController extends Controller
 
         if (isset($request->phone_number)) {
             $request->phone_number = preg_replace('/\s+/', '', $request->phone_number);
-            if (!preg_match("/[0-9]{10}/", $request->phone_number)) {
+            if (!preg_match("/^[0-9]{10}$/", $request->phone_number)) {
                 return response()->json([
                     'status' => false,
                     'message' => 'Số điện thoại phải là 10 số (chấp nhận khoảng trắng)'
@@ -73,7 +73,7 @@ class StudentController extends Controller
 
         $request->birthday = new DateTime($request->birthday);
         $request->birthday = $request->birthday->format('Y-m-d');
-        if (!preg_match("/(19|20)[0-9]{2}\-(0?[1-9]|1[012])\-(1[0-9]|2[0-9]|3[01]|0?[1-9])/", $request->birthday)) {
+        if (!preg_match("/^(19|20)[0-9]{2}\-(0?[1-9]|1[012])\-(1[0-9]|2[0-9]|3[01]|0?[1-9])$/", $request->birthday)) {
             return response()->json([
                 'status' => false,
                 'message' => 'Ngày sinh không hợp lệ'
@@ -124,7 +124,7 @@ class StudentController extends Controller
             if ($tableHeader['phone_number'][0] != null && empty($value[$tableHeader['phone_number'][0]]) == false) {
                 $phone_number = preg_replace('/\s+/', '', $value[$tableHeader['phone_number'][0]]);
                 $value[$tableHeader['phone_number'][0]] = $phone_number;
-                if (preg_match("/[0-9]{10}/", $value[$tableHeader['phone_number'][0]])) {
+                if (preg_match("/^[0-9]{10}$/", $value[$tableHeader['phone_number'][0]])) {
                     // xxxx xxx xxx
                     $dataTable[$key][$tableHeader['phone_number'][0]] = substr($phone_number, 0, 4) . " " . substr($phone_number, 4, 3) . " " . substr($phone_number, 7, 3);
                 } else {
@@ -132,7 +132,7 @@ class StudentController extends Controller
                 }
             }
             if ($tableHeader['birthday'][0] != null && empty($value[$tableHeader['birthday'][0]]) == false) {
-                if (!preg_match("/(19|20)[0-9]{2}\-(0?[1-9]|1[012])\-(1[0-9]|2[0-9]|3[01]|0?[1-9])/", $value[$tableHeader['birthday'][0]])) {
+                if (!preg_match("/^(19|20)[0-9]{2}\-(0?[1-9]|1[012])\-(1[0-9]|2[0-9]|3[01]|0?[1-9])$/", $value[$tableHeader['birthday'][0]])) {
                     $check = false;
                 }
             }
@@ -250,7 +250,7 @@ class StudentController extends Controller
             // Số điện thoại
             if (isset($request->phone_number)) {
                 $request->phone_number = preg_replace('/\s+/', '', $request->phone_number);
-                if (!preg_match("/[0-9]{10}/", $request->phone_number)) {
+                if (!preg_match("/^[0-9]{10}$/", $request->phone_number)) {
                     return response()->json([
                         'status' => false,
                         'message' => 'Số điện thoại phải là 10 số (chấp nhận khoảng trắng)'
@@ -265,7 +265,7 @@ class StudentController extends Controller
             if (isset($request->birthday)) {
                 $request->birthday = new DateTime($request->birthday);
                 $request->birthday = $request->birthday->format('Y-m-d');
-                if (!preg_match("/(19|20)[0-9]{2}\-(0?[1-9]|1[012])\-(1[0-9]|2[0-9]|3[01]|0?[1-9])/", $request->birthday)) {
+                if (!preg_match("/^(19|20)[0-9]{2}\-(0?[1-9]|1[012])\-(1[0-9]|2[0-9]|3[01]|0?[1-9])$/", $request->birthday)) {
                     return response()->json([
                         'status' => false,
                         'message' => 'Ngày sinh không hợp lệ'

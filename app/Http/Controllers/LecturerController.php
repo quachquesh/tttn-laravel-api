@@ -43,7 +43,7 @@ class LecturerController extends Controller
 
         $request->birthday = new DateTime($request->birthday);
         $request->birthday = $request->birthday->format('Y-m-d');
-        if (!preg_match("/(19|20)[0-9]{2}\-(0?[1-9]|1[012])\-(1[0-9]|2[0-9]|3[01]|0?[1-9])/", $request->birthday)) {
+        if (!preg_match("/^(19|20)[0-9]{2}\-(0?[1-9]|1[012])\-(1[0-9]|2[0-9]|3[01]|0?[1-9])$/", $request->birthday)) {
             return response()->json([
                 'status' => false,
                 'message' => 'Ngày sinh không hợp lệ'
@@ -56,12 +56,13 @@ class LecturerController extends Controller
 
         if (isset($request->phone_number)) {
             $phone_number = preg_replace('/\s+/', '', $request->phone_number);
-            if (!preg_match("/[0-9]{10}/", $phone_number)) {
+            if (!preg_match("/^[0-9]{10}$/", $phone_number)) {
                 return response()->json([
                     'status' => false,
                     'message' => 'Số điện thoại phải là 10 số (chấp nhận khoảng trắng)'
                 ]);
             }
+
             $user->phone_number = $phone_number;
         }
 

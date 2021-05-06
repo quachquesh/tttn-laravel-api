@@ -49,3 +49,27 @@ php artisan passport:client --password
 ```
 php artisan config:cache
 ```
+## 9. Mở file routes/api.php -> mở/đóng comment như phí dưới
+```php
+// lecturer
+Route::prefix('lecturer')->group(function () {
+    // quyền admin
+    Route::middleware(['auth:api-lecturer', 'scopes:admin'])->group(function () {
+        // comment route này lại
+        // Route::post('', 'LecturerController@store');
+    });
+    // Mở comment route này ra
+    Route::post('', 'LecturerController@store');
+});
+```
+## 10. Mở postman gửi request <b>[POST]</b> đến <b>domain-api/api/v1/lecturer</b>
+```
+email = email
+password = min:6|max:25
+first_name = min:2|max:50
+last_name = min:2|max:20
+sex = boolean (0: Nam, 1: Nữ)
+birthday = yyyy-mm-dd
+address = max:255
+role = admin
+```
