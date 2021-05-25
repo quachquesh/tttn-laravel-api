@@ -25,13 +25,30 @@ class ClassSubjectController extends Controller
 
     public function index(Request $request)
     {
-        $userId = $request->user()->id;
-        $classSubjects = ClassMember::where("student_id", $userId)
-                                    ->join("class_subjects", "class_subjects.id", "=", "class_members.class_id")
-                                    ->join("subjects", "class_subjects.subject_id", "=", "subjects.id")
-                                    ->select("class_subjects.*", "subjects.name as subject_name", "subjects.description as subject_description")
-                                    ->get();
-        return response()->json($classSubjects);
+        $helper = new Helpers;
+        $user = $helper->getUserData($request);
+
+        // gv, admin
+        if ($user && $user->role) {
+            $classSubjects = ClassSubject::where("create_by", $user->id)
+                                        ->join("subjects", "subjects.id", "=", "class_subjects.subject_id")
+                                        ->select("class_subjects.*", "subjects.name as subject_name", "subjects.description as subject_description")
+                                        ->get();
+            foreach ($classSubjects as $key => $value) {
+                $count = ClassMember::where("class_id", $value->id)->count();
+                $classSubjects[$key]['number_of_member'] = $count;
+            }
+            return response()->json($classSubjects);
+        } else {
+            // sv
+            $classSubjects = ClassMember::where("student_id", $user->id)
+                                        ->join("class_subjects", "class_subjects.id", "=", "class_members.class_id")
+                                        ->join("subjects", "class_subjects.subject_id", "=", "subjects.id")
+                                        ->select("class_subjects.*", "subjects.name as subject_name", "subjects.description as subject_description")
+                                        ->get();
+            return response()->json($classSubjects);
+        }
+
     }
 
     public function getAllClass(Request $request)
@@ -60,6 +77,14 @@ class ClassSubjectController extends Controller
             $class->fill($request->all());
             $class->key = $this->randomKey();
             $class->create_by = $request->user()->id;
+            $month = date("n"); // tháng 1 - 12
+            if ($month > 8 && $month < 2) { // tháng 9-1 học kỳ 1
+                $class->semester = "1";
+            } else if ($month > 6) { // tháng 7-8 - học kỳ hè
+                $class->semester = "3";
+            } else { // tháng 2-6 // học kỳ 2
+                $class->semester = "2";
+            }
             if ($class->save()) {
                 return response()->json([
                     'status' => true,
@@ -197,7 +222,63 @@ class ClassSubjectController extends Controller
 
     public function update(Request $request, $id)
     {
-        //
+        $class = ClassSubject::find($id);
+        if ($class) {
+            $userId = $request->user()->id;
+
+            // Người tạo ra lớp học mới được chỉnh sửa
+            if ($userId != $class->create_by) {
+                return response()->json([], 500);
+            }
+
+            if (isset($request->name)) {
+                if (empty($request->name)) {
+                    return response()->json([
+                        "status" => false,
+                        "message" => "Tên không được để trống"
+                    ]);
+                } else {
+                    $class->name = $request->name;
+                }
+            }
+
+            if (isset($request->description)) {
+                $class->description = $request->description;
+            }
+
+            if (isset($request->img) && !empty($request->img)) {
+                $class->img = $request->img;
+            }
+
+            if (isset($request->maximum_group_member)) {
+                if ($request->maximum_group_member < 2) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Thành viên nhóm phải có ít nhất 2 người'
+                    ]);
+                } else {
+                    $class->maximum_group_member = $request->maximum_group_member;
+                }
+            }
+            if (isset($request->student_create_group)) {
+                $class->student_create_group = !!$request->student_create_group;
+            }
+
+            if ($class->save()) {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Cập nhật thành công',
+                    'data' => $class
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Cập nhật thất bại'
+                ]);
+            }
+        } else {
+            return response()->json([], 404);
+        }
     }
 
     /**

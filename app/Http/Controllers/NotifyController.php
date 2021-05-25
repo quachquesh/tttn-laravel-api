@@ -19,18 +19,19 @@ class NotifyController extends Controller
         $role = $user->role ? "lecturers" : "students";
         if (!empty($listFiles)) {
             foreach ($listFiles as $file) {
-                // Check file tồn tại chưa
-                if (Storage::disk("local")->exists($role."/".$user->id."/".$file->getClientOriginalName())) {
-                    $number = 1;
-                    $filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-                    $extension = pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION);
-                    while (Storage::disk("local")->exists($role."/".$user->id."/".$filename."_".$number.".".$extension)) {
-                        $number++;
-                    }
-                    $path = $file->storeAs($role."/".$user->id, $filename."_".$number.".".$extension);
-                } else {
-                    $path = $file->storeAs($role."/".$user->id, $file->getClientOriginalName());
-                }
+                // // Check file tồn tại chưa
+                // if (Storage::disk("local")->exists($role."/".$user->id."/".$file->getClientOriginalName())) {
+                //     $number = 1;
+                //     $filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                //     $extension = pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION);
+                //     while (Storage::disk("local")->exists($role."/".$user->id."/".$filename."_".$number.".".$extension)) {
+                //         $number++;
+                //     }
+                //     $path = $file->storeAs($role."/".$user->id, $filename."_".$number.".".$extension);
+                // } else {
+                //     $path = $file->storeAs($role."/".$user->id, $file->getClientOriginalName());
+                // }
+                $path = $file->store($role."/".$user->id);
                 $file = NotifyAttach::create([
                     "notify_id" => $notifyId,
                     "file_name" => $file->getClientOriginalName(),

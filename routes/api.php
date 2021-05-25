@@ -50,9 +50,15 @@ Route::prefix('v1')->group(function () {
     //     });
     // });
 
+
+    Route::prefix('user')->group(function () {
+        Route::get("details", "UserController@details");
+        Route::post("login", "UserController@login");
+        Route::get("logout", "UserController@logout");
+    });
+
     // student
     Route::prefix('student')->group(function () {
-        Route::post('login', 'StudentController@login');
         Route::middleware(['auth:api-student', 'scopes:sv'])->group(function () {
             Route::get('details', 'StudentController@details');
             Route::get('logout', 'StudentController@logout');
@@ -74,8 +80,6 @@ Route::prefix('v1')->group(function () {
 
     // lecturer
     Route::prefix('lecturer')->group(function () {
-        Route::post('login', 'LecturerController@login');
-
         Route::middleware(['auth:api-lecturer', 'scope:gv,admin'])->group(function () {
             Route::get('details', 'LecturerController@details');
             Route::get('logout', 'LecturerController@logout');
@@ -85,6 +89,7 @@ Route::prefix('v1')->group(function () {
         Route::middleware(['auth:api-lecturer', 'scopes:admin'])->group(function () {
             Route::post('', 'LecturerController@store');
         });
+        // Route::post('', 'LecturerController@store');
     });
 
     // Môn học
@@ -99,6 +104,7 @@ Route::prefix('v1')->group(function () {
         // gv, admin
         Route::middleware(['auth:api-lecturer', 'scope:gv,admin'])->group(function () {
             Route::get('', "SubjectController@index");
+            Route::get('/all', "SubjectController@showAll");
             Route::get('/user', "SubjectController@showByUserId");
         });
 
@@ -106,9 +112,7 @@ Route::prefix('v1')->group(function () {
 
     // Lớp học
     Route::prefix('class-subject')->group(function () {
-        Route::middleware(['auth:api-student', 'scopes:sv'])->group(function () {
-            Route::get('/user', 'ClassSubjectController@index');
-        });
+        Route::get('/user', 'ClassSubjectController@index');
         Route::get('/{id}', 'ClassSubjectController@show')->where('id', '[0-9]+');
         Route::get('/all-info/{id}', 'ClassSubjectController@allInfo')->where('id', '[0-9]+');
 
@@ -121,8 +125,13 @@ Route::prefix('v1')->group(function () {
         Route::middleware(['auth:api-lecturer', 'scope:gv,admin'])->group(function () {
             Route::post('', 'ClassSubjectController@store');
             Route::get('', 'ClassSubjectController@getAllClass');
+            Route::put('/{id}', 'ClassSubjectController@update')->where('id', '[0-9]+');
             Route::get('/subject/{id}', 'ClassSubjectController@showBySubject')->where('id', '[0-9]+');
         });
+
+        // group
+        Route::get('/{id}/groups', 'GroupController@index')->where('id', '[0-9]+');
+        Route::post('/{id}/groups/{type}', 'GroupController@store')->where(['id' => '[0-9]+','type' => '[0-9]']);;
     });
 
     // Thành viên lớp
@@ -157,5 +166,4 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::get('download', "DownloadController@download");
-    Route::get("user/details", "UserController@details");
 });

@@ -23,10 +23,16 @@ class SubjectController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'img' => 'required'
+            'img' => 'required',
+            'semester' => 'required|numeric'
         ]);
+        if (isset($request->description)) {
+            $description = $request->description;
+        } else {
+            $description = "";
+        }
         $checkSubject = Subject::where("name", $request->name)
-                                ->where("description", $request->description)
+                                ->where("description", $description)
                                 ->first();
         if ($checkSubject) {
             return response()->json([
@@ -70,6 +76,19 @@ class SubjectController extends Controller
             array_push($result, $value[0]);
         }
         return response()->json($result);
+    }
+
+    public function showAll(Request $request)
+    {
+        $userId = $request->user()->id;
+        $subjects = Subject::get();
+        foreach ($subjects as $key => $value) {
+            $count = ClassSubject::where("subject_id", $value->id)
+                                    ->where("create_by", $userId)
+                                    ->count();
+            $subjects[$key]["number_of_class"] = $count;
+        }
+        return response()->json($subjects);
     }
 
     public function update(Request $request, $id)

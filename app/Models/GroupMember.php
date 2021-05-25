@@ -12,11 +12,6 @@ class GroupMember extends Model
         'role'
     ];
 
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
     protected $hidden = [
 
     ];

@@ -17,9 +17,8 @@ class CreateClassGroupsTable extends Migration
             $table->id();
             $table->foreignId('class_id')->references('id')->on("class_subjects")->onDelete('restrict')->onUpdate('cascade');
             $table->string("name");
-            $table->integer("member_min")->default(1);
-            $table->integer("member_max")->default(5);
-            $table->tinyInteger("isActive")->default(1);
+            $table->text("description");
+            $table->text("note");
             $table->timestamps();
         });
     }

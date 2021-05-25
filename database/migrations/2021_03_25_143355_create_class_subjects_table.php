@@ -22,6 +22,9 @@ class CreateClassSubjectsTable extends Migration
             $table->text("img");
             $table->tinyInteger("isActive")->default(1);
             $table->string("key", 10);
+            $table->tinyInteger("semester")->comment("Học kỳ");
+            $table->integer("maximum_group_member")->default(3)->comment("Thành viên tối đa trong nhóm");
+            $table->tinyInteger("student_create_group")->default(0)->comment("Sinh viên có thể tự tạo nhóm");
             $table->timestamps();
         });
     }

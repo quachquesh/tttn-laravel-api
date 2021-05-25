@@ -16,7 +16,7 @@ class CreateGroupMembersTable extends Migration
         Schema::create('group_members', function (Blueprint $table) {
             $table->id();
             $table->foreignId('member_id')->references('id')->on("class_members")->onDelete('cascade');
-            $table->foreignId('group_id')->references('id')->on("class_groups")->onDelete('restrict');
+            $table->foreignId('group_id')->references('id')->on("class_groups")->onDelete('cascade');
             $table->tinyInteger("role")->default(0)->comment("0: thành viên, 1: nhóm trưởng");
             $table->timestamps();
         });

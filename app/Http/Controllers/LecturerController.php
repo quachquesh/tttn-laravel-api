@@ -19,8 +19,8 @@ class LecturerController extends Controller
         $request->validate([
             'email' => 'required|email',
             'password' => 'required|min:6|max:25',
-            'first_name' => 'required|min:2|max:50',
-            'last_name' => 'required|min:2|max:20',
+            'first_name' => 'required|max:50',
+            'last_name' => 'required|max:20',
             'sex' => 'required|boolean',
             'birthday' => 'required|date',
             'phone_number' => 'min:10|max:12',
@@ -59,7 +59,7 @@ class LecturerController extends Controller
             if (!preg_match("/^[0-9]{10}$/", $phone_number)) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Số điện thoại phải là 10 số (chấp nhận khoảng trắng)'
+                    'message' => 'Số điện thoại phải là 10 số'
                 ]);
             }
 
@@ -92,50 +92,6 @@ class LecturerController extends Controller
     public function destroy($id)
     {
         //
-    }
-
-    public function login(Request $request)
-    {
-        $request->validate([
-            'email' => 'required',
-            'password' => 'required'
-        ]);
-
-        $user = Lecturer::where('email', $request->email)->first();
-        if ($user) {
-            if (!$user->isActive) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Tài khoản đã bị khóa'
-                ]);
-            } else {
-                if (Hash::check($request->password, $user->password)) {
-                    $tokenResult = $user->createToken('Lecturers', [$user->role]);
-                    $user->token = $tokenResult->accessToken;
-                    // $user->token_expires_at = Carbon::parse($tokenResult->token->expires_at)->toDateTimeString();
-
-                    return response()->json([
-                        'status' => true,
-                        'message' => 'Đăng nhập thành công',
-                        'data' => $user
-                    ]);
-                }
-            }
-        }
-
-        return response()->json([
-            'status' => false,
-            'message' => 'Sai email hoặc mật khẩu'
-        ]);
-    }
-
-    public function logout(Request $request)
-    {
-        $request->user()->token()->revoke();
-        return response()->json([
-            'status' => true,
-            'message' => 'Đăng xuất thành công'
-        ]);
     }
 
     public function details()

@@ -12,7 +12,10 @@ class ClassSubject extends Model
         'description',
         'img',
         'isActive',
-        'key'
+        'key',
+        'semester',
+        'maximum_group_member',
+        'student_create_group'
     ];
 
     /**

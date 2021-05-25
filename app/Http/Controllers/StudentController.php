@@ -44,10 +44,12 @@ class StudentController extends Controller
                 ]);
             }
         }
+
         $request->validate([
             'mssv' => 'required',
-            'first_name' => 'required|min:2|max:50',
-            'last_name' => 'required|min:2|max:20',
+            'classroom' => 'required',
+            'first_name' => 'required|max:50',
+            'last_name' => 'required|max:20',
             'sex' => 'required|boolean',
             'birthday' => 'required|date',
             'phone_number' => 'min:10|max:12',
@@ -64,7 +66,13 @@ class StudentController extends Controller
             }
         }
 
-        if (Student::where('mssv', $request->mssv)->first()) {
+        if (!preg_match("/^(DH|LT)[0-9]{8}$/", $request->mssv)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'MSSV không đúng định dạng'
+            ]);
+        } else if (Student::where('mssv', $request->mssv)->first()) {
+            // Đúng định dạng thì check xem sv đã tồn tại chưa
             return response()->json([
                 'status' => false,
                 'message' => 'Sinh viên đã tồn tại'
@@ -83,6 +91,9 @@ class StudentController extends Controller
         $student = new Student;
         $student->fill($request->all());
         $student->birthday = $request->birthday;
+        if (!isset($request->email) || empty($request->email)) {
+            $student->email = $student->mssv . "@student.stu.edu.vn";
+        }
         if (isset($student->password)) {
             $student->password = Hash::make($request->password);
         } else {
@@ -109,7 +120,7 @@ class StudentController extends Controller
         foreach ($dataTable as $key => $value) {
             $check = true;
             $value[$tableHeader['sex'][0]] = $this->checkSex($value[$tableHeader['sex'][0]]);
-            if ($value[$tableHeader['sex'][0]] == 0) {
+            if ($value[$tableHeader['sex'][0]] == false) {
                 $dataTable[$key][$tableHeader['sex'][0]] = "Nam";
             } else {
                 $dataTable[$key][$tableHeader['sex'][0]] = "Nữ";
@@ -131,14 +142,23 @@ class StudentController extends Controller
                     $check = false;
                 }
             }
+
             if ($tableHeader['birthday'][0] != null && empty($value[$tableHeader['birthday'][0]]) == false) {
                 if (!preg_match("/^(19|20)[0-9]{2}\-(0?[1-9]|1[012])\-(1[0-9]|2[0-9]|3[01]|0?[1-9])$/", $value[$tableHeader['birthday'][0]])) {
                     $check = false;
                 }
             }
 
+            if (!preg_match("/^(DH|LT)[0-9]{8}$/", $value[$tableHeader['mssv'][0]])) {
+                $check = false;
+            }
+
             // check requied
-            if ($value[$tableHeader['address'][0]] == null || $value[$tableHeader['mssv'][0]] == null || $value[$tableHeader['first_name'][0]] == null || $value[$tableHeader['last_name'][0]] == null) {
+            if ($value[$tableHeader['address'][0]] == null ||
+                $value[$tableHeader['mssv'][0]] == null ||
+                $value[$tableHeader['first_name'][0]] == null ||
+                $value[$tableHeader['last_name'][0]] == null
+            ) {
                 $check = false;
             }
 
@@ -156,20 +176,21 @@ class StudentController extends Controller
                             $student[$kFill] = $value[$tableHeader[$kFill][0]];
                         }
                     }
+                    // check email để tạo email
+                    if (!isset($student->email) || empty($student->email)) {
+                        $student->email = $student->mssv . "@student.stu.edu.vn";
+                        $dataTable[$key][$tableHeader['email'][0]] = $student->email;
+                    }
                     // check pass để random pass
                     if (isset($student->password)) {
                         $student->password = Hash::make($request->password);
                     } else {
                         $password_random = $this->randomPwd();
                         $student->password = Hash::make($password_random);
+                        $dataTable[$key]['password_random'] = $password_random;
+                        $password_random_flag = true;
                     }
-
                     if ($student->save()) {
-                    // if (true) {
-                        if (isset($password_random)) {
-                            $dataTable[$key]['password_random'] = $password_random;
-                            $password_random_flag = true;
-                        }
                         $dataTable[$key]['status'] = 1;
                     } else {
                         $dataTable[$key]['status'] = 0;
@@ -234,6 +255,16 @@ class StudentController extends Controller
         $user = Student::find($id);
         if ($user) {
 
+            // Lớp
+            if (!isset($request->classroom) || empty($request->classroom)) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Chưa có thông tin lớp học'
+                ]);
+            } else {
+                $user->classroom = $request->classroom;
+            }
+
             // EMAIL
             if (isset($request->email)) {
                 if (!filter_var($request->email, FILTER_VALIDATE_EMAIL)) {
@@ -253,7 +284,7 @@ class StudentController extends Controller
                 if (!preg_match("/^[0-9]{10}$/", $request->phone_number)) {
                     return response()->json([
                         'status' => false,
-                        'message' => 'Số điện thoại phải là 10 số (chấp nhận khoảng trắng)'
+                        'message' => 'Số điện thoại phải là 10 số'
                     ]);
                 }
                 $user->phone_number = $request->phone_number;
@@ -316,56 +347,6 @@ class StudentController extends Controller
         } else {
             return response()->json([], 404);
         }
-    }
-
-    public function destroy($id)
-    {
-        //
-    }
-
-    public function login(Request $request)
-    {
-        $request->validate([
-            'mssv' => 'required',
-            'password' => 'required'
-        ]);
-
-        $user = Student::where('mssv', $request->mssv)->first();
-        if ($user) {
-            if (!$user->isActive) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Tài khoản đã bị khóa'
-                ]);
-            } else {
-                if (Hash::check($request->password, $user->password)) {
-
-                    $tokenResult = $user->createToken('Students', ['sv']);
-                    $user->token = $tokenResult->accessToken;
-                    // $user->token_expires_at = Carbon::parse($tokenResult->token->expires_at)->toDateTimeString();
-
-                    return response()->json([
-                        'status' => true,
-                        'message' => 'Đăng nhập thành công',
-                        'data' => $user
-                    ]);
-                }
-            }
-        }
-
-        return response()->json([
-            'status' => false,
-            'message' => 'Sai mssv hoặc mật khẩu'
-        ]);
-    }
-
-    public function logout(Request $request)
-    {
-        $request->user()->token()->revoke();
-        return response()->json([
-            'status' => true,
-            'message' => 'Đăng xuất thành công'
-        ]);
     }
 
     public function details()

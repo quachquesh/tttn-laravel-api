@@ -9,9 +9,8 @@ class ClassGroup extends Model
     protected $fillable = [
         'class_id',
         'name',
-        'member_min',
-        'member_max',
-        'isActive'
+        'description',
+        'note'
     ];
 
     /**

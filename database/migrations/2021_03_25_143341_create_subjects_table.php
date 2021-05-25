@@ -19,6 +19,7 @@ class CreateSubjectsTable extends Migration
             $table->string("description")->nullable();
             $table->text("img");
             $table->tinyInteger("isActive")->default(1);
+            $table->tinyInteger("semester");
             $table->timestamps();
         });
     }

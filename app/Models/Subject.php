@@ -11,7 +11,8 @@ class Subject extends Model
         'description',
         'img',
         'isActive',
-        'create_by'
+        'create_by',
+        'semester'
     ];
 
     /**

@@ -15,6 +15,7 @@ class Student extends Authenticatable
         'email',
         'mssv',
         'password',
+        'classroom',
         'isActive',
         'first_name',
         'last_name',

@@ -15,15 +15,19 @@ class Helpers {
         if ($bearerToken) {
             $tokenId = Configuration::forUnsecuredSigner()->parser()->parse($bearerToken)->claims()->get('jti');
             $token = Token::find($tokenId);
-            $table = strtolower($token->name);
-            $userId = $token->user_id;
-            $data = null;
-            if ($table == "students") {
-                $data = Student::find($userId);
+            if (!$token->revoked) {
+                $table = strtolower($token->name);
+                $userId = $token->user_id;
+                $data = null;
+                if ($table == "students") {
+                    $data = Student::find($userId);
+                } else {
+                    $data = Lecturer::find($userId);
+                }
+                return $data;
             } else {
-                $data = Lecturer::find($userId);
+                return null;
             }
-            return $data;
         } else {
             return null;
         }
@@ -39,5 +43,14 @@ class Helpers {
         } else {
             return null;
         }
+    }
+
+    public function object2Array($obj)
+    {
+        $result = array();
+        foreach ($obj as $value) {
+            array_push($result, $value);
+        }
+        return $result;
     }
 }

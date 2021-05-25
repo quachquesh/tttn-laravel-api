@@ -18,6 +18,7 @@ class CreateStudentsTable extends Migration
             $table->string("email")->nullable();
             $table->string("mssv")->unique();
             $table->string("password");
+            $table->string("classroom");
             $table->tinyInteger("isActive")->default(1);
             $table->string("first_name", 50);
             $table->string("last_name", 20);
