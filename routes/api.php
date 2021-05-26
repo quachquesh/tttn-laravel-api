@@ -130,8 +130,14 @@ Route::prefix('v1')->group(function () {
         });
 
         // group
+        Route::get('/{id}/group', 'GroupController@getMyGroup')->where('id', '[0-9]+');
         Route::get('/{id}/groups', 'GroupController@index')->where('id', '[0-9]+');
-        Route::post('/{id}/groups/{type}', 'GroupController@store')->where(['id' => '[0-9]+','type' => '[0-9]']);;
+        Route::post('/{id}/groups/{type}', 'GroupController@store')->where(['id' => '[0-9]+','type' => '[0-9]']);
+        // ticket group
+        Route::get('/{id}/ticket-groups', 'GroupController@getTickets')->where('id', '[0-9]+');
+        Route::post('/{id}/ticket-groups/{type}', 'GroupController@createTicket')->where(['id' => '[0-9]+','type' => '[0-9]']);
+        Route::put('/{id}/ticket-groups/{ticket_id}', 'GroupController@updateTicket')->where(['id' => '[0-9]+','ticket_id' => '[0-9]+']);
+        Route::delete('/{id}/ticket-groups/{ticket_id}', 'GroupController@destroyTicket')->where(['id' => '[0-9]+','ticket_id' => '[0-9]+']);
     });
 
     // Thành viên lớp

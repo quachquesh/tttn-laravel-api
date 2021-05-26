@@ -8,9 +8,12 @@ class TicketGroup extends Model
 {
     protected $fillable = [
         'member_id',
-        'group_id',
-        'status',
-        'ticket_type'
+        'member_target',
+        'ticket_type',
+        'reason',
+        'group_now',
+        'group_going',
+        'status'
     ];
 
     /**

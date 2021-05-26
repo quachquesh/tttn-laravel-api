@@ -33,7 +33,7 @@ class UserController extends Controller
         if (filter_var($request->username, FILTER_VALIDATE_EMAIL)) {
             $user = Lecturer::where('email', $request->username)->first();
         } else {
-            $user = Student::where('mssv', $request->username)->first();
+            $user = Student::whereIn('mssv', [strtolower($request->username), strtoupper($request->username)])->first();
         }
 
         if ($user) {
@@ -56,6 +56,11 @@ class UserController extends Controller
                         'status' => true,
                         'message' => 'Đăng nhập thành công',
                         'data' => $user
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Sai Tài khoản hoặc Mật khẩu'
                     ]);
                 }
             }
